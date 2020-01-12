@@ -1,1 +1,65 @@
-/* You can add global styles to this file, and also import other style files */
+body {
+  background-image: url("/assets/background.jpg");
+  background-size: contain;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.title {
+  font-size: 140%;
+}
+.subtitle {
+  font-size: 100%;
+}
+
+.gold {
+  color: darkgoldenrod;
+}
+.silver {
+  color: dimgray;
+}
+.lumber {
+  color: saddlebrown;
+}
+.coal {
+  color: darkslategrey;
+}
+.winter {
+  background-color: purple;
+  color: white;
+}
+.used {
+  background-color: PowderBlue;
+}
+
+#pricetable {
+  position: absolute;
+  left: 5%;
+  top: 8%;
+  background-color: white;
+  td {
+    border: 2px solid black;
+    overflow: hidden;
+    width: 7vw;
+    text-align: center;
+    font-size: 120%;
+    padding: 4px;
+    text-wrap: normal;
+  }
+}
+
+#buttontable {
+  position: absolute;
+  left: 12%;
+  top: 80%;
+  height: 10vh;
+  background-color: white;
+  td {
+    border: 2px solid black;
+    overflow: hidden;
+    text-align: center;
+    width: 10vw;
+    text-wrap: normal;
+  }
+}
+

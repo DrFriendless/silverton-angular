@@ -1,20 +1,54 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<table id="pricetable" *ngIf="priceTableVisible">
+  <thead><tr></tr></thead>
+  <tbody>
+  <tr>
+    <td></td>
+    <td *ngFor="let type of types" [className]="type.commodity.toLowerCase()">
+      <div class="title">{{type.commodity}}</div>
+      <br>
+      <div class="subtitle">{{type.location}}</div>
+    </td>
+  </tr>
+  <tr>
+    <td>Price</td>
+    <td *ngFor="let type of types" [className]="type.commodity.toLowerCase()">
+      {{currentPrice(type.id)}}
+    </td>
+  </tr>
+  <tr *ngFor="let player of players">
+    <td>Player {{player}}</td>
+    <td playerCommodity *ngFor="let type of types"
+        class="player-commodity"
+        [clicks]="clicks"
+        id="{{type.id}}"
+        player="{{player}}"
+        value="{{sold(player, type.id)}}">
+    </td>
+  </tr>
+  </tbody>
+</table>
 
+<table id="buttontable" *ngIf="buttonTableVisible">
+  <tbody><tr>
+    <td><button id="prevRound" (click)="prevRound()" [disabled]="round === 1">Previous Round</button></td>
+    <td><button id="nextRound" (click)="nextRound()">End Round</button></td>
+    <td *ngIf="round % 4 !== 0">Round {{round}}</td>
+    <td class="winter" *ngIf="round % 4 === 0">{{round}} WINTER</td>
+  </tr></tbody>
+</table>
+
+<table id="starttable" *ngIf="startTableVisible">
+  <tbody>
+  <tr><td><button (click)="start(1, 'normal')">Denver $30000 Solitaire</button></td><tr>
+  <tr><td><button (click)="start(1, 'normal')">Denver $50000 Solitaire</button></td><tr>
+  <tr><td><button (click)="start(1, 'slcsolo')">Salt Lake City $50000 Solitaire</button></td><tr>
+  <tr><td><button (click)="start(1, 'denversolo')">Denver Campaign Solitaire</button></td><tr>
+  <tr><td><button (click)="start(2, 'normal')">Golden Spike 2 Player</button></td><tr>
+  <tr><td><button (click)="start(3, 'normal')">Golden Spike 3 Player</button></td><tr>
+  <tr><td><button (click)="start(2, 'normal')">2 Player</button></td><tr>
+  <tr><td><button (click)="start(3, 'normal')">3 Player</button></td><tr>
+  <tr><td><button (click)="start(4, 'normal')">4 Player</button></td><tr>
+  <tr><td><button (click)="start(5, 'normal')">5 Player</button></td><tr>
+  <tr><td><button (click)="start(6, 'normal')">6 Player</button></td><tr>
+  </tbody>
+</table>
