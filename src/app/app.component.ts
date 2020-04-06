@@ -21,16 +21,15 @@ export class AppComponent implements OnInit {
   startTableVisible = true;
   priceTableVisible = false;
   buttonTableVisible = false;
-  types: CommodityDefinition[];
+  types: readonly CommodityDefinition[];
   players: Player[] = [];
   clicks = new EventEmitter<Click>();
   round = 1;
   history: Round[] = [];
-  commodityIndex: Record<CommodityKey, CommodityDefinition> = {} as Record<CommodityKey, CommodityDefinition>;
+  commodityIndex = {} as Record<CommodityKey, CommodityDefinition>;
 
   ngOnInit(): void {
     this.clicks.subscribe((click: Click) => {
-      console.log(this.history);
       const sr = this.currentRound().commodities[click.id];
       let val = this.sold(click.playerNum, click.id);
       const def = this.commodityIndex[click.id];
@@ -60,30 +59,26 @@ export class AppComponent implements OnInit {
   start(playerCount: UpTo6, scenario: ScenarioType): void {
     this.numPlayers = playerCount;
     for (let i=1; i <= playerCount; i++) this.players.push(i as Player);
-    this.types = commodityTypes.filter(t => t.minPlayers <= playerCount);
+    this.types = buildCommodityTypes(scenario, playerCount);
     this.types.forEach(type => this.commodityIndex[type.id] = type);
     console.log(this.commodityIndex);
-    this.history.push(this.newRound(this.round));
-    // eval(modifier + '()');
-    // build();
+    this.history.push(buildNewRound(this.round, this.commodityIndex));
     this.startTableVisible = false;
     this.priceTableVisible = true;
     this.buttonTableVisible = true;
   }
 
   prevRound(): void {
-    if (this.round > 1) {
-      this.round--;
-    }
+    if (this.round > 1) this.round--;
   }
 
   nextRound(): void {
     const newPriceIndexes = this.endOfRound(this.history[this.round - 1]);
     this.round++;
-    if (this.history.length <= this.round) {
-      this.history.push(this.newRound(this.round));
+    if (this.history.length < this.round) {
+      this.history.push(buildNewRound(this.round, this.commodityIndex));
     }
-    const newRound = this.history[this.round];
+    const newRound = this.history[this.round-1];
     for (const commodity in newPriceIndexes) {
       const key = commodity as CommodityKey;
       const cdef: CommodityDefinition = this.commodityIndex[key];
@@ -91,7 +86,6 @@ export class AppComponent implements OnInit {
       newRound.prices[key] = cdef.prices[newPriceIndexes[key]] as number;
       // future price indexes and prices might still be incorrect, but we'll fix them when we get to them.
     }
-    console.log(newRound);
   }
 
   endOfRound(round: Round): Record<CommodityKey, number> {
@@ -122,24 +116,6 @@ export class AppComponent implements OnInit {
     return result;
   }
 
-  // the first round is 1
-  private newRound(number: number): Round {
-    // TODO - any way to get rid of these casts?
-    const commodities = {} as Record<CommodityKey, SeasonSales>;
-    const prices = {} as Record<CommodityKey, number>;
-    for (const type of commodityTypes) {
-      console.log(type.id);
-      console.log(this.commodityIndex[type.id]);
-      const sr = newSeason();
-      commodities[type.id] = newSeason();
-      if (number === 1) {
-        sr.priceIndex = this.commodityIndex[type.id].start;
-        const p = this.commodityIndex[type.id].prices[sr.priceIndex];
-        prices[type.id] = p as number;
-      }
-    }
-    return { number, commodities, prices, idn: INCREASED_DEMAND_NUMBER[number - 1] };
-  }
 }
 
 function newSeason(): SeasonSales {
@@ -168,3 +144,45 @@ function applyPriceChange(prices: readonly Price[], initial: number, delta: numb
   return current;
 }
 
+// the first round is 1
+function buildNewRound(number: number, commodityIndex: Record<CommodityKey, CommodityDefinition>): Round {
+  // TODO - any way to get rid of these casts?
+  const commodities = {} as Record<CommodityKey, SeasonSales>;
+  const prices = {} as Record<CommodityKey, number>;
+  for (const type in commodityIndex) {
+    const key = type as CommodityKey;
+    const sr = newSeason();
+    commodities[key] = newSeason();
+    if (number === 1) {
+      sr.priceIndex = commodityIndex[key].start;
+      const p = commodityIndex[key].prices[sr.priceIndex];
+      prices[key] = p as number;
+    }
+  }
+  return { number, commodities, prices, idn: INCREASED_DEMAND_NUMBER[number - 1] };
+}
+
+function buildCommodityTypes(scenario: ScenarioType, playerCount: UpTo6): readonly CommodityDefinition[] {
+  const index = {} as Record<CommodityKey, CommodityDefinition>;
+  commodityTypes.forEach(type => index[type.id] = type);
+  switch (scenario) {
+    case 'denversolo':
+      index.silverslc.start -= 2;
+      index.lumberslc.start -= 2;
+      index.lumbersantafe.start -= 2;
+      index.coalslc.start -= 2;
+      index.coalsantafe.start -= 2;
+      return commodityTypes;
+    case 'slcsolo':
+      index.silverdenver.start -= 2;
+      index.lumberdenver.start -= 2;
+      index.lumberpueblo.start -= 2;
+      index.lumbersantafe.start -= 2;
+      index.coaldenver.start -= 2;
+      index.coalpueblo.start -= 2;
+      index.coalsantafe.start -= 2;
+      return commodityTypes;
+    case 'normal':
+      return commodityTypes.filter(t => t.minPlayers <= playerCount);
+  }
+}
